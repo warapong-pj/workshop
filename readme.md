@@ -43,30 +43,28 @@ apt-get install -y kubelet kubeadm kubectl
 apt-mark hold kubelet kubeadm kubectl
 
 # Initital Kubernetes Cluster
-kubeadm init --control-plane-endpoint=cluster-endpoint --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address=192.168.1.50
+kubeadm init --control-plane-endpoint=cluster-endpoint --pod-network-cidr=10.244.0.0/16
 
 # Setup Access to Cluster
-export KUBECONFIG=/etc/kubernetes/admin.conf
-
-# Deploy Container Network Interface
-kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
-
-kubectl taint nodes --all node-role.kubernetes.io/master-
-
 export KUBECONFIG=/etc/kubernetes/admin.conf
 
 mkdir -p $HOME/.kube
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
-# tear down
+# Deploy Container Network Interface
+kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+
+kubectl taint nodes --all node-role.kubernetes.io/master-
+
+# Tear Down
 1. kubectl drain ubuntu --delete-local-data --force --ignore-daemonsets
 2. kubeadm reset
 3. iptables -F && iptables -t nat -F && iptables -t mangle -F && iptables -X *ipvsadm -C*
 4. kubectl delete node ubuntu 
 
 
-# config host network
+# Config Host Network
 ```
 network:
   version: 2
@@ -79,6 +77,3 @@ network:
       nameservers:
         addresses: [8.8.8.8, 1.1.1.1]
 ```
-
-
-192.168.1.111 master1 cluster-endpoint
