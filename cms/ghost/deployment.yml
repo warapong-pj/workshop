@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ghost
+  labels:
+    app: ghost
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ghost
+  template:
+    metadata:
+      labels:
+        app: ghost
+    spec:
+      containers:
+      - name: ghost
+        image: ghost:3.40.2-alpine
+        env:
+        - name: database__connection__user
+          valueFrom:
+            secretKeyRef:
+              name: mysql
+              key: username
+        - name: database__connection__password
+          valueFrom:
+            secretKeyRef:
+              name: mysql
+              key: password
+        - name: database__connection__database
+          valueFrom:
+            configMapKeyRef:
+              name: mysql
+              key: database
+        - name: database__connection__host
+          valueFrom:
+            configMapKeyRef:
+              name: mysql
+              key: hostname
+        - name: database__client
+          valueFrom:
+            configMapKeyRef:
+              name: mysql
+              key: type
+        ports:
+        - containerPort: 2368
