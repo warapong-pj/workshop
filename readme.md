@@ -12,18 +12,13 @@ systemctl enable crio
 systemctl start crio
 
 # Setup System
+echo 'br_netfilter' > /etc/modules
+
 cat > /etc/sysctl.d/99-kubernetes-cri.conf <<EOF
 net.bridge.bridge-nf-call-iptables = 1
 net.bridge.bridge-nf-call-ip6tables = 1
 net.ipv4.ip_forward = 1
 EOF
-
-sysctl --system
-modprobe br_netfilter
-
-echo 'br_netfilter' > /etc/modules
-
-echo '1' > /proc/sys/net/ipv4/ip_forward
 
 swapoff -a
 
@@ -72,8 +67,13 @@ network:
     eth0:
       dhcp4: false
       addresses:
-        - 192.168.1.121/24
+        - 192.168.1.111/24
       gateway4: 192.168.1.1
       nameservers:
         addresses: [8.8.8.8, 1.1.1.1]
 ```
+
+# Issue 
+### LVM Disk Space
+1. lvextend -l +100%FREE /dev/ubuntu-vg/ubuntu-lv
+2. resize2fs /dev/ubuntu-vg/ubuntu-lv
