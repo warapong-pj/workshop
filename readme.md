@@ -66,6 +66,22 @@ kubectl taint nodes --all node-role.kubernetes.io/master-
 # deploy kong ingress controller
 1. kubectl apply -f https://bit.ly/k4k8s
 
+# Get authenticate container registry and create token
+cat ~/TOKEN.txt | docker login https://docker.pkg.github.com -u USERNAME --password-stdin
+
+### Sample file after login to container registry 
+```
+{
+  "auths": {
+    "docker.pkg.github.com": {
+        "auth": "xxx"
+    }
+  }
+}
+```
+
+kubectl create secret generic regcred --from-file=.dockerconfigjson=/path/to/config.json --type=kubernetes.io/dockerconfigjson
+
 # Config Host Network
 ```
 network:

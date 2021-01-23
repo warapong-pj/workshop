@@ -1,0 +1,15 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: app
+  annotations:
+    kubernetes.io/ingress.class: "kong"
+spec:
+  rules:
+  - host: app.demo.local
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: app
+          servicePort: 80
