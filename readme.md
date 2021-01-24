@@ -27,11 +27,11 @@ apt-get update
 apt-get install -y apt-transport-https curl  
 
 # Install Kubernetes Tools
-cat <<EOF | sudo tee /etc/apt/sources.list.d/kubernetes.list  
+cat <<EOF | tee /etc/apt/sources.list.d/kubernetes.list  
 deb https://apt.kubernetes.io/ kubernetes-xenial main  
 EOF  
 
-curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -  
+curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -  
 
 apt-get update  
 apt-get install -y kubelet kubeadm kubectl  
@@ -44,8 +44,8 @@ kubeadm init --control-plane-endpoint=cluster-endpoint --pod-network-cidr=10.244
 export KUBECONFIG=/etc/kubernetes/admin.conf  
 
 mkdir -p $HOME/.kube  
-sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config  
-sudo chown $(id -u):$(id -g) $HOME/.kube/config  
+cp -i /etc/kubernetes/admin.conf $HOME/.kube/config  
+chown $(id -u):$(id -g) $HOME/.kube/config  
 
 # Deploy Container Network Interface
 kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml  
