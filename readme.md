@@ -1,73 +1,73 @@
 # Install Container Runtime
-echo "deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_18.04/ /" > /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list
-echo "deb http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/1.17/xUbuntu_18.04/ /" > /etc/apt/sources.list.d/devel:kubic:libcontainers:stable:cri-o:1.17.list
+echo "deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_18.04/ /" > /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list  
+echo "deb http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/1.17/xUbuntu_18.04/ /" > /etc/apt/sources.list.d/devel:kubic:libcontainers:stable:cri-o:1.17.list  
 
-curl -L https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable:cri-o:1.17/xUbuntu_18.04/Release.key | apt-key add -
-curl -L https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_18.04/Release.key | apt-key add -
+curl -L https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable:cri-o:1.17/xUbuntu_18.04/Release.key | apt-key add -  
+curl -L https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_18.04/Release.key | apt-key add -  
 
-apt-get update
-apt-get install -y cri-o cri-o-runc runc
+apt-get update  
+apt-get install -y cri-o cri-o-runc runc  
 
-systemctl enable crio
-systemctl start crio
+systemctl enable crio  
+systemctl start crio  
 
 # Setup System
-echo 'br_netfilter' > /etc/modules
+echo 'br_netfilter' > /etc/modules  
 
-cat > /etc/sysctl.d/99-kubernetes-cri.conf <<EOF
-net.bridge.bridge-nf-call-iptables = 1
-net.bridge.bridge-nf-call-ip6tables = 1
-net.ipv4.ip_forward = 1
-EOF
+cat > /etc/sysctl.d/99-kubernetes-cri.conf <<EOF  
+net.bridge.bridge-nf-call-iptables = 1  
+net.bridge.bridge-nf-call-ip6tables = 1  
+net.ipv4.ip_forward = 1  
+EOF  
 
-swapoff -a
+swapoff -a  
 
 # Install Requirement Packages
-apt-get update
-apt-get install -y apt-transport-https curl
+apt-get update  
+apt-get install -y apt-transport-https curl  
 
 # Install Kubernetes Tools
-cat <<EOF | sudo tee /etc/apt/sources.list.d/kubernetes.list
-deb https://apt.kubernetes.io/ kubernetes-xenial main
-EOF
+cat <<EOF | sudo tee /etc/apt/sources.list.d/kubernetes.list  
+deb https://apt.kubernetes.io/ kubernetes-xenial main  
+EOF  
 
-curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -  
 
-apt-get update
-apt-get install -y kubelet kubeadm kubectl
-apt-mark hold kubelet kubeadm kubectl
+apt-get update  
+apt-get install -y kubelet kubeadm kubectl  
+apt-mark hold kubelet kubeadm kubectl  
 
 # Initital Kubernetes Cluster
-kubeadm init --control-plane-endpoint=cluster-endpoint --pod-network-cidr=10.244.0.0/16
+kubeadm init --control-plane-endpoint=cluster-endpoint --pod-network-cidr=10.244.0.0/16  
 
 # Setup Access to Cluster
-export KUBECONFIG=/etc/kubernetes/admin.conf
+export KUBECONFIG=/etc/kubernetes/admin.conf  
 
-mkdir -p $HOME/.kube
-sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-sudo chown $(id -u):$(id -g) $HOME/.kube/config
+mkdir -p $HOME/.kube  
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config  
+sudo chown $(id -u):$(id -g) $HOME/.kube/config  
 
 # Deploy Container Network Interface
-kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml  
 
-kubectl taint nodes --all node-role.kubernetes.io/master-
+kubectl taint nodes --all node-role.kubernetes.io/master-  
 
 # Tear Down
-1. kubectl drain ubuntu --delete-local-data --force --ignore-daemonsets
-2. kubeadm reset
-3. iptables -F && iptables -t nat -F && iptables -t mangle -F && iptables -X *ipvsadm -C*
-4. kubectl delete node ubuntu 
+1. kubectl drain ubuntu --delete-local-data --force --ignore-daemonsets  
+2. kubeadm reset  
+3. iptables -F && iptables -t nat -F && iptables -t mangle -F && iptables -X *ipvsadm -C*  
+4. kubectl delete node ubuntu  
 
 # To use ingress on-premise, we meed to deploy Metallb to cluster
-1. kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.9.5/manifests/namespace.yaml
-2. kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.9.5/manifests/metallb.yaml
-3. kubectl create secret generic -n metallb-system memberlist --from-literal=secretkey="$(openssl rand -base64 128)"
-4. kubectl apply -f metallb/configmap.yml
+1. kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.9.5/manifests/namespace.yaml  
+2. kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.9.5/manifests/metallb.yaml  
+3. kubectl create secret generic -n metallb-system memberlist --from-literal=secretkey="$(openssl rand -base64 128)"  
+4. kubectl apply -f metallb/configmap.yml  
 # deploy kong ingress controller
-1. kubectl apply -f https://bit.ly/k4k8s
+1. kubectl apply -f https://bit.ly/k4k8s  
 
 # Get authenticate container registry and create token
-cat ~/TOKEN.txt | docker login https://docker.pkg.github.com -u USERNAME --password-stdin
+cat ~/TOKEN.txt | docker login https://docker.pkg.github.com -u USERNAME --password-stdin  
 
 ### Sample file after login to container registry 
 ```
@@ -80,7 +80,7 @@ cat ~/TOKEN.txt | docker login https://docker.pkg.github.com -u USERNAME --passw
 }
 ```
 
-kubectl create secret generic regcred --from-file=.dockerconfigjson=/path/to/config.json --type=kubernetes.io/dockerconfigjson
+kubectl create secret generic regcred --from-file=.dockerconfigjson=/path/to/config.json --type=kubernetes.io/dockerconfigjson  
 
 # Config Host Network
 ```
