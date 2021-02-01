@@ -14,3 +14,7 @@ spec:
         volumes:
         - name: elasticsearch-data
           emptyDir: {}
+  http:
+    tls:
+      selfSignedCertificate:
+        disabled: true
