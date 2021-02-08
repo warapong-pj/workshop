@@ -8,6 +8,7 @@ spec:
   image: quay.io/prometheus/prometheus:v2.22.2
   replicas: 1
   serviceAccountName: prometheus
+  serviceMonitorNamespaceSelector: {} 
   serviceMonitorSelector: {}
   resources:
     requests:
