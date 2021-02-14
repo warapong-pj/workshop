@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: jaeger
+  # namespace: observability 
+  annotations:
+    kubernetes.io/ingress.class: "kong"
+spec:
+  rules:
+  - host: jaeger.demo.local
+    http:
+      paths:
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: tracing-query
+            port:
+              number: 16686
