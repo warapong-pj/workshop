@@ -1,0 +1,96 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: logstash
+data:
+  logstash.yml: |
+    http.host: "0.0.0.0"
+    path.config: /usr/share/logstash/pipeline
+  logstash.conf: |
+    input {
+      udp {
+        port => 5000
+      }
+    }
+    filter {
+    }
+    output {
+      elasticsearch {
+        index => "ingress-%{[@metadata][beat]}"
+        hosts => [ "${ES_HOSTS}" ]
+        user => "${ES_USER}"
+        password => "${ES_PASSWORD}"
+      }
+    }
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: logstash
+data:
+  elastic_password: c1VENjRzMDNwN2Vod0ozSDA1OEQ1dVNE
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: logstash
+spec:
+  selector:
+    matchLabels:
+      app: logstash
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: logstash
+    spec:
+      containers:
+        - name: logstash
+          image: docker.elastic.co/logstash/logstash:7.7.1
+          ports:
+            - containerPort: 5000
+              protocol: UDP
+          # command: ["logstash-plugin"]
+          # args: ["install", "logstash-input-udp"]
+          env:
+          - name: ES_HOSTS
+            value: "http://logging-es-http:9200"
+          - name: ES_USER
+            value: "elastic"
+          - name: ES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: logstash
+                key: elastic_password
+          volumeMounts:
+          - name: config-volume
+            mountPath: /usr/share/logstash/config
+          - name: logstash-pipeline-volume
+            mountPath: /usr/share/logstash/pipeline
+      volumes:
+        - name: config-volume
+          configMap:
+            name: logstash
+            items:
+              - key: logstash.yml
+                path: logstash.yml
+        - name: logstash-pipeline-volume
+          configMap:
+            name: logstash
+            items:
+              - key: logstash.conf
+                path: logstash.conf
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: logstash
+spec:
+  selector:
+    app: logstash
+  ports:
+    - name: log
+      port: 5000
+      targetPort: 5000
+      protocol: UDP
+  type: ClusterIP

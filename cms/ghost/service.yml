@@ -9,7 +9,7 @@ spec:
   - name: mysql
     protocol: TCP
     port: 3306
-  type: NodePort
+  type: ClusterIP
 ---
 apiVersion: v1
 kind: Service
@@ -22,4 +22,4 @@ spec:
   - name: ghost
     protocol: TCP
     port: 2368
-  type: NodePort
+  type: ClusterIP

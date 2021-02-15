@@ -1,0 +1,22 @@
+apiVersion: jaegertracing.io/v1
+kind: Jaeger
+metadata:
+  name: tracing
+spec:
+  # strategy: production
+  storage:
+    type: elasticsearch
+    options:
+      es:
+        server-urls: http://logging-es-http:9200
+        index-prefix: tracing
+    secretName: jaeger-secret
+  resources:
+    requests:
+      memory: "64Mi"
+      cpu: "250m"
+    limits:
+      memory: "128Mi"
+      cpu: "500m"
+  ingress:
+    enabled: false

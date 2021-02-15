@@ -1,0 +1,15 @@
+apiVersion: monitoring.coreos.com/v1
+kind: Prometheus
+metadata:
+  name: k8s
+  labels:
+    app: prometheus
+spec:
+  image: quay.io/prometheus/prometheus:v2.22.2
+  replicas: 1
+  serviceAccountName: prometheus
+  serviceMonitorNamespaceSelector: {} 
+  serviceMonitorSelector: {}
+  resources:
+    requests:
+      memory: 400Mi
