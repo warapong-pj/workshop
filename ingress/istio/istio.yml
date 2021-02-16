@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: istio-system
+---
+apiVersion: install.istio.io/v1alpha1
+kind: IstioOperator
+metadata:
+  # namespace: istio-system
+  name: poc
+spec:
+  profile: minimal
+  values:
+    global:
+      tracer:
+        zipkin:
+          address: tracing-collector.default.svc.cluster.local:9411
+
+# apiVersion: install.istio.io/v1alpha1
+# kind: IstioOperator
+# metadata:
+#   name: poc
+#   namespace: istio-operator
+# spec:
+#   profile: minimal
+#   values:
+#     global:
+#       tracer:
+#         zipkin:
+#           address: tracing-collector.default.svc.cluster.local:9411
+
+#     # values.global.tracer.zipkin.address=<jaeger-collector-address>:9411
