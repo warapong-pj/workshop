@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: istio-system
+---
+apiVersion: install.istio.io/v1alpha1
+kind: IstioOperator
+metadata:
+  namespace: istio-system
+  name: sidecar
+spec:
+  profile: minimal
+  meshConfig:
+    defaultConfig:
+      tracing:
+        sampling: 100
+        custom_tags:
+          my_tag_header:
+            header:
+              name: host
+  values:
+    global:
+      tracer:
+        zipkin:
+          address: tracing-collector.default.svc.cluster.local:9411
