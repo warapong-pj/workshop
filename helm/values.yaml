@@ -1,0 +1,32 @@
+nameOverride: "sample"
+fullnameOverride: "sample-web"
+environment: dev
+
+image:
+  repository: nginx
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 2
+  targetCPUUtilizationPercentage: 80
+
+replicaCount: 1
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: "kong"
+  hosts:
+    - host: nginx.demo.local
+      paths:
+      - path: /
+        backend:
+          servicePort: 80
+  tls: []
