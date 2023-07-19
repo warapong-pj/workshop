@@ -65,3 +65,57 @@ jobs:
 1. install pre-commit `pip install pre-commit`
 2. install git hook script `pre-commit install`
 3. generate sample pre-commit `pre-commit sample-config > .pre-commit-config.yaml`
+
+### scan sensitive data before push to repository
+1. copy this code to .pre-commit-config.yaml
+```
+- repo: https://github.com/Yelp/detect-secrets
+  rev: v1.4.0
+  hooks:
+  - id: detect-secrets
+```
+
+### scan vulnerability Assessment container image
+1. replace code to existing pipeline
+```
+name: Build pipeline
+
+on: [ push ]
+
+jobs:
+  build-pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout source code
+        uses: actions/checkout@v3
+      - name: install dependencies
+        run: |
+          npm install
+      - name: run scan dependencies vulnerability assessment
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+      - name: login to github packages
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: build temporary container image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          push: false
+          tags: ghcr.io/${{ github.actor }}/app:${{ github.sha }}
+      - name: run scan image vulnerability assessment
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ghcr.io/${{ github.actor }}/app:${{ github.sha }}
+      - name: push container image to container registry
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          push: true
+          tags: ghcr.io/${{ github.actor }}/app:${{ github.sha }}
+```
