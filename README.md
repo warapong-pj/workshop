@@ -137,7 +137,7 @@ jobs:
 ```
 kind create cluster
 ```
-2. add helm repo and install kyverno to cluster
+2. add helm repo and install opa gatekeeper to cluster
 ```
 helm repo add gatekeeper https://open-policy-agent.github.io/gatekeeper/charts
 helm install gatekeeper gatekeeper/gatekeeper --values values-gatekeeper.yaml --version 3.12.0 --namespace gatekeeper-system --create-namespace
