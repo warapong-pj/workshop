@@ -75,7 +75,7 @@ jobs:
   - id: detect-secrets
 ```
 
-### scan vulnerability Assessment container image
+### scan vulnerability assessment and scan dast
 1. replace code to existing pipeline
 ```
 name: Build pipeline
@@ -118,4 +118,16 @@ jobs:
           context: .
           push: true
           tags: ghcr.io/${{ github.actor }}/app:${{ github.sha }}
+```
+2. add step to scan dast
+```
+      - name: scan dast
+        run: |
+          #!/bin/sh
+
+          set -xe
+
+          docker network create dast
+          docker run -i -t -d -p 3000:3000 --network dast --name app ghcr.io/${{ github.actor }}/app:${{ github.sha }}
+          docker run -t --net dast owasp/zap2docker-stable zap-full-scan.py -I -j -m 10 -T 60 -t http://app:3000
 ```
