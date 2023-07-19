@@ -131,3 +131,30 @@ jobs:
           docker run -i -t -d -p 3000:3000 --network dast --name app ghcr.io/${{ github.actor }}/app:${{ github.sha }}
           docker run -t --net dast owasp/zap2docker-stable zap-full-scan.py -I -j -m 10 -T 60 -t http://app:3000
 ```
+
+### enforce deploy policy to kubernetes cluster
+1. create kubernetes cluster
+```
+kind create cluster
+```
+2. add helm repo and install kyverno to cluster
+```
+helm repo add gatekeeper https://open-policy-agent.github.io/gatekeeper/charts
+helm install gatekeeper gatekeeper/gatekeeper --values values-gatekeeper.yaml --version 3.12.0 --namespace gatekeeper-system --create-namespace
+```
+3. declare require resources
+```
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/containerresources/template.yaml
+```
+4. enforce require resources
+```
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/containerresources/samples/container-must-have-limits-and-requests/constraint.yaml
+```
+5. deploy disallow policy pod
+```
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/containerresources/samples/container-must-have-limits-and-requests/only-memory-limits-defined-disallowed.yaml
+```
+6. deploy allow policy pod
+```
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/containerresources/samples/container-must-have-limits-and-requests/limits-and-requests-defined-allowed.yaml
+```
