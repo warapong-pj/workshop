@@ -11,7 +11,7 @@ jobs:
       - name: install dependencies
         run: |
           npm install --save-dev
-          npm test:cov
+          npm run test:cov
       - name: sonarqube scan
         uses: sonarsource/sonarqube-scan-action@v2.1.0
         env:
