@@ -12,3 +12,7 @@
 3. setup workfow environment secret by use value from previsionly step
 4. goto `Repository Setting -> Actions -> General`
 5. on workflow permission choose Read and write permissions
+
+### install nestjs
+1. npm install -g @nestjs/cli
+2. npx nest new sample-app --directory=. -g
