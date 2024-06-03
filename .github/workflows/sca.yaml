@@ -1,0 +1,20 @@
+name: sca/sbom pipeline
+
+on: [ push ]
+
+jobs:
+  build-pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout source code
+        uses: actions/checkout@v4
+      - name: snyk scan sca/sbom
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      # - name: snyk scan container image
+      #   uses: snyk/actions/docker@master
+      #   env:
+      #     SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      #   with:
+      #     image: ghcr.io/${{ github.actor }}/sample-app:${{ github.sha }}
