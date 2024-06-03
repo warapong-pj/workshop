@@ -8,6 +8,9 @@ jobs:
     steps:
       - name: checkout source code
         uses: actions/checkout@v4
+      - name: install dependencies
+        run: |
+          npm install
       - name: snyk scan sca/sbom
         uses: snyk/actions/node@master
         env:
