@@ -3,9 +3,15 @@ name: dast pipeline
 on: [ push ]
 
 jobs:
-  build-pipeline:
+  dast-pipeline:
     runs-on: ubuntu-latest
     steps:
+      - name: login to github packages
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: scan dast
         run: |
           #!/bin/sh
