@@ -1,9 +1,6 @@
 name: sca/sbom pipeline
 
-on:
-  pull_request:
-    branches:
-      - release/**
+on: [ push ]
 
 jobs:
   sca-pipeline:

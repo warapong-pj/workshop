@@ -1,9 +1,6 @@
 name: ci pipeline
 
-on:
-  pull_request:
-    branches:
-      - 'release/**'
+on: [ push ]
 
 jobs:
   ci-pipeline:
