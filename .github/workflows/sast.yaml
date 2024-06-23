@@ -3,7 +3,7 @@ name: sast pipeline
 on: [ push ]
 
 jobs:
-  build-pipeline:
+  sast-pipeline:
     runs-on: ubuntu-latest
     steps:
       - name: checkout source code

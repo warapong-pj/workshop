@@ -3,10 +3,10 @@ name: ci pipeline
 on:
   pull_request:
     branches:
-      - release/**
+      - 'release/**'
 
 jobs:
-  build-pipeline:
+  ci-pipeline:
     runs-on: ubuntu-latest
     steps:
       - name: checkout source code
