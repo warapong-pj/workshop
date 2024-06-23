@@ -13,5 +13,5 @@ jobs:
           set -xe
 
           docker network create dast
-          docker run -i -t -d -p 3000:3000 --network dast --name app ghcr.io/${{ github.actor }}/app:${{ github.sha }}
+          docker run -i -t -d -p 3000:3000 --network dast --name app ghcr.io/${{ github.actor }}/sample-app:${{ github.sha }}
           docker run -t --net dast owasp/zap2docker-stable zap-full-scan.py -I -j -m 10 -T 60 -t http://app:3000
